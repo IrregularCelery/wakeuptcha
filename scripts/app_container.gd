@@ -1,74 +1,58 @@
 extends Control
 
 @onready var container: MarginContainer = $Container
-@onready var content: MarginContainer = $Container/Content
 
-# For easier debugging/testing mobile layout
-@export var force_mobile_layout: bool = false
+# For easier debugging/testing portrait layout
+@export var force_portrait_layout: bool = false
+
+var last_scale: float = 1.0
+var updating_scale: bool = false
 
 func _ready() -> void:
 	get_tree().root.size_changed.connect(_on_window_resize)
 	_update_layout()
 
 
-func is_mobile_resolution() -> bool:
-	if force_mobile_layout:
+func is_portrait() -> bool:
+	if force_portrait_layout:
 		return true
-		
+	
 	var viewport_size: Vector2 = get_viewport_rect().size
+	var aspect_ratio: float = viewport_size.x / viewport_size.y
 	
-	var aspect_ratio: float = float(viewport_size.x) / float(viewport_size.y)
-	
-	const BREAKDOWN: int = Settings.MOBILE_TABLET_BREAKPOINT
-	
-	return viewport_size.x <= BREAKDOWN or aspect_ratio <= 0.7 # Taller than wide
+	return aspect_ratio <= 0.75 # Taller than widet
 
 
 func _update_layout() -> void:
 	var window_size: Vector2 = get_viewport().get_visible_rect().size
-	
-	if is_mobile_resolution():
-		# Mobile layout: Content takes full screen, ignoring margins
 		
-		container.visible = false
+	if is_portrait():
+		# Portrait layout: Content takes full screen, ignoring margins
+
+		container.set_anchors_preset(Control.PRESET_FULL_RECT)
+		container.offset_left = 0 
+		container.offset_right = 0
+		container.offset_top = 0
+		container.offset_bottom = 0
+	else: 
+		# Landscape layout: Portrait container in center
 		
-		if content.get_parent() == container:
-			container.remove_child(content)
-			add_child(content)
-			
-		content.set_anchors_preset(Control.PRESET_FULL_RECT)
-		content.offset_left = 0 
-		content.offset_right = 0
-		content.offset_top = 0
-		content.offset_bottom = 0
-	else:
-		# Desktop layout: Portrait container in center
+		# 90% of window height
+		var container_scale: float = window_size.y * 0.9 / Settings.PORTRAIT_HEIGHT
 		
-		container.visible = true
-		
-		if content.get_parent() != container:
-			content.get_parent().remove_child(content)
-			container.add_child(content)
-		
-		var portrait_scale = min(
-			window_size.x * 0.8 / Settings.MIN_PORTRAIT_WIDTH, # 80% of window width
-			window_size.y * 0.9 / Settings.MIN_PORTRAIT_HEIGHT # 90% of window height
-		)
-		
-		var container_size = Vector2(
-			Settings.MIN_PORTRAIT_WIDTH,
-			Settings.MIN_PORTRAIT_HEIGHT
-		) * portrait_scale
+		var container_size := Vector2(
+			Settings.PORTRAIT_WIDTH,
+			Settings.PORTRAIT_HEIGHT
+		) * container_scale
 		
 		container.custom_minimum_size = container_size
-		container.size = container_size
 		container.position = (window_size - container_size) / 2
-		
-		content.set_anchors_preset(PRESET_FULL_RECT)
-		content.offset_left = Settings.PORTRAIT_PADDING
-		content.offset_right = -Settings.PORTRAIT_PADDING
-		content.offset_top = Settings.PORTRAIT_PADDING
-		content.offset_bottom = -Settings.PORTRAIT_PADDING
+
+		container.set_anchors_preset(Control.PRESET_CENTER)
+		container.offset_left = 0 
+		container.offset_right = 0
+		container.offset_top = 0
+		container.offset_bottom = 0
 
 
 func _on_window_resize() -> void:
