@@ -31,16 +31,15 @@ layout_mode = 2
 [node name="Alarm" type="Control" parent="Container"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Container/Alarm"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="Button" type="Button" parent="Container/Alarm/VBoxContainer"]
-layout_mode = 2
-text = "Alarm"
-
-[node name="Label" type="Label" parent="Container/Alarm/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "WAKEUPTCHA!"
+[node name="Label" type="Label" parent="Container/Alarm"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -162.5
+offset_top = 48.0
+offset_right = 162.5
+offset_bottom = 115.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 48
+text = "WAKEUPTCHA"

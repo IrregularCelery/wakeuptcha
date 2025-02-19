@@ -2,58 +2,46 @@ extends Control
 
 @onready var container: MarginContainer = $Container
 
-# For easier debugging/testing portrait layout
-@export var force_portrait_layout: bool = false
-
-var last_scale: float = 1.0
-var updating_scale: bool = false
-
 func _ready() -> void:
-	get_tree().root.size_changed.connect(_on_window_resize)
-	_update_layout()
+	get_viewport().connect("size_changed", _on_window_resize)
+	update_layout()
 
 
 func is_portrait() -> bool:
-	if force_portrait_layout:
-		return true
-	
 	var viewport_size: Vector2 = get_viewport_rect().size
 	var aspect_ratio: float = viewport_size.x / viewport_size.y
-	
-	return aspect_ratio <= 0.75 # Taller than widet
+
+	return aspect_ratio <= 0.75 # Taller than wide
 
 
-func _update_layout() -> void:
-	var window_size: Vector2 = get_viewport().get_visible_rect().size
-		
+func update_layout() -> void:
 	if is_portrait():
 		# Portrait layout: Content takes full screen, ignoring margins
 
 		container.set_anchors_preset(Control.PRESET_FULL_RECT)
-		container.offset_left = 0 
+		container.offset_left = 0
 		container.offset_right = 0
 		container.offset_top = 0
 		container.offset_bottom = 0
-	else: 
+	else:
 		# Landscape layout: Portrait container in center
 		
-		# 90% of window height
-		var container_scale: float = window_size.y * 0.9 / Settings.PORTRAIT_HEIGHT
+		# For having padding on top and bottom of the container
+		var multiplier: float = get_viewport_rect().size.y \
+		* (1.0 - Constants.PORTRAIT_PADDING_Y * 2.0) / Constants.DESIGN_HEIGHT
 		
 		var container_size := Vector2(
-			Settings.PORTRAIT_WIDTH,
-			Settings.PORTRAIT_HEIGHT
-		) * container_scale
-		
-		container.custom_minimum_size = container_size
-		container.position = (window_size - container_size) / 2
+			Constants.DESIGN_WIDTH,
+			Constants.DESIGN_HEIGHT
+		) * multiplier
 
+		container.custom_minimum_size = container_size
 		container.set_anchors_preset(Control.PRESET_CENTER)
-		container.offset_left = 0 
+		container.offset_left = 0
 		container.offset_right = 0
 		container.offset_top = 0
 		container.offset_bottom = 0
 
 
 func _on_window_resize() -> void:
-	_update_layout()
+	update_layout()
