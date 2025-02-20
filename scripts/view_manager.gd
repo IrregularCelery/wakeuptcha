@@ -4,11 +4,11 @@ var views := {}
 var view_instances := {}
 var current_view: Control = null
 var current_view_name: String = ""
-var animation_duration := 0.2
+var animation_duration := 0.25
 var is_transitioning := false
 var transition_queue := []
 
-var default_transition := "zoom"
+var default_transition := "fade"
 
 var cache_enabled := false
 var max_cached_views := 3
@@ -166,6 +166,8 @@ func _animate_fade(tween: Tween, new_view: Control) -> void:
 
 
 func _animate_slide(tween: Tween, new_view: Control) -> void:
+	new_view.position = Vector2.ZERO
+
 	var offset := Vector2(0.0, 20.0)
 	var current_position := new_view.position
 

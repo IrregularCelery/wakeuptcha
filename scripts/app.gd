@@ -13,6 +13,8 @@ func _ready() -> void:
 	ViewManager.configure({
 		"cache_enabled": true,
 		"max_cached_views": 5,
+		"animation_duration": 0.1,
+		"default_transition": "slide",
 	})
 	ViewManager.preload_views({
 		"home": "res://scenes/views/home.tscn",
