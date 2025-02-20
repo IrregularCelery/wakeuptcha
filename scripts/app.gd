@@ -6,6 +6,21 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_on_window_resize)
 	update_layout()
 
+	await get_tree().process_frame
+
+	get_node("/root/ViewManager").reparent(container)
+
+	ViewManager.configure({
+		"cache_enabled": true,
+		"max_cached_views": 5,
+	})
+	ViewManager.preload_views({
+		"home": "res://scenes/views/home.tscn",
+		"settings": "res://scenes/views/settings.tscn",
+	}, true)
+	ViewManager.set_default_view("home")
+
+
 
 func is_portrait() -> bool:
 	var viewport_size: Vector2 = get_viewport_rect().size
