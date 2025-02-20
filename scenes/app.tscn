@@ -24,7 +24,7 @@ func update_current_time() -> void:
 	]
 "
 
-[node name="AppContainer" type="Control"]
+[node name="App" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
