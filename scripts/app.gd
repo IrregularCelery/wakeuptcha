@@ -3,7 +3,7 @@ extends Control
 @onready var container: MarginContainer = $Container
 
 func _ready() -> void:
-	get_viewport().connect("size_changed", _on_window_resize)
+	get_viewport().size_changed.connect(_on_window_resize)
 	update_layout()
 
 
@@ -35,6 +35,8 @@ func update_layout() -> void:
 	container.custom_minimum_size = container_size
 	container.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 
+
+# Signals
 
 func _on_window_resize() -> void:
 	update_layout()

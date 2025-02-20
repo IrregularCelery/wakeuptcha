@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://n7h5nlusfbgl"]
 
-[ext_resource type="Script" path="res://scripts/app_container.gd" id="1_w1rkb"]
+[ext_resource type="Script" path="res://scripts/app.gd" id="1_w1rkb"]
 
 [sub_resource type="GDScript" id="GDScript_mbuur"]
 script/source = "extends Label
@@ -11,12 +11,13 @@ func _ready() -> void:
 	update_current_time()
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	update_current_time()
 
 
 func update_current_time() -> void:
 	current_time = Time.get_time_dict_from_system()
+	
 	text = \"%02d:%02d:%02d\" % [
 		current_time.hour,
 		current_time.minute,

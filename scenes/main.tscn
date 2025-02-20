@@ -4,4 +4,4 @@
 
 [node name="Main" type="Node3D"]
 
-[node name="AppContainer" parent="." instance=ExtResource("1_doxxr")]
+[node name="App" parent="." instance=ExtResource("1_doxxr")]
