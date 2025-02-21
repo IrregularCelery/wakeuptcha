@@ -1,6 +1,6 @@
 extends Control
 
-@onready var container: MarginContainer = $Container
+@onready var container: Panel = $Container
 
 func _ready() -> void:
 	get_viewport().size_changed.connect(_on_window_resize)
