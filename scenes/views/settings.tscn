@@ -1,4 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://dafln5j4redw2"]
+[gd_scene load_steps=3 format=3 uid="uid://dafln5j4redw2"]
+
+[ext_resource type="Theme" uid="uid://cvlmw0fs1i8bw" path="res://themes/default_theme.tres" id="1_32jac"]
 
 [sub_resource type="GDScript" id="GDScript_3mvsr"]
 script/source = "extends Control
@@ -11,11 +13,18 @@ func _on_button_pressed() -> void:
 
 [node name="Settings" type="Control"]
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -427.0
+offset_right = 240.0
+offset_bottom = 427.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_32jac")
 script = SubResource("GDScript_3mvsr")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
