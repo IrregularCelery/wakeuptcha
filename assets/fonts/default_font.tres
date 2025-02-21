@@ -1,0 +1,6 @@
+[gd_resource type="FontVariation" load_steps=2 format=3 uid="uid://bbbdonqv2gdap"]
+
+[ext_resource type="FontFile" uid="uid://blmv5ovd87lap" path="res://assets/fonts/font_awesome.ttf" id="1_rjgmu"]
+
+[resource]
+fallbacks = Array[Font]([ExtResource("1_rjgmu")])
