@@ -1,29 +1,38 @@
-[gd_scene load_steps=2 format=3 uid="uid://n7h5nlusfbgl"]
+[gd_scene load_steps=4 format=3 uid="uid://n7h5nlusfbgl"]
 
 [ext_resource type="Script" path="res://scripts/app.gd" id="1_w1rkb"]
+[ext_resource type="Theme" uid="uid://cvlmw0fs1i8bw" path="res://themes/default_theme.tres" id="2_q2ywq"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7kodj"]
+bg_color = Color(0.0862745, 0.0862745, 0.0941176, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+corner_detail = 12
+expand_margin_left = 8.0
+expand_margin_top = 8.0
+expand_margin_right = 8.0
+expand_margin_bottom = 8.0
+shadow_color = Color(0, 0, 0, 0.184314)
+shadow_size = 12
 
 [node name="App" type="Control"]
+clip_contents = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_q2ywq")
 script = ExtResource("1_w1rkb")
 
-[node name="Container" type="MarginContainer" parent="."]
+[node name="Container" type="Panel" parent="."]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -240.0
-offset_top = -427.0
-offset_right = 240.0
-offset_bottom = 427.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="Panel" type="Panel" parent="Container"]
-layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_7kodj")
