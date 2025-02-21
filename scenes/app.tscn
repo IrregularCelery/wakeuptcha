@@ -1,29 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://n7h5nlusfbgl"]
+[gd_scene load_steps=2 format=3 uid="uid://n7h5nlusfbgl"]
 
 [ext_resource type="Script" path="res://scripts/app.gd" id="1_w1rkb"]
-
-[sub_resource type="GDScript" id="GDScript_mbuur"]
-script/source = "extends Label
-
-var current_time: Dictionary
-
-func _ready() -> void:
-	update_current_time()
-
-
-func _process(_delta: float) -> void:
-	update_current_time()
-
-
-func update_current_time() -> void:
-	current_time = Time.get_time_dict_from_system()
-	
-	text = \"%02d:%02d:%02d\" % [
-		current_time.hour,
-		current_time.minute,
-		current_time.second
-	]
-"
 
 [node name="App" type="Control"]
 layout_mode = 3
@@ -50,33 +27,3 @@ grow_vertical = 2
 
 [node name="Panel" type="Panel" parent="Container"]
 layout_mode = 2
-
-[node name="Alarm" type="Control" parent="Container"]
-layout_mode = 2
-
-[node name="Title" type="Label" parent="Container/Alarm"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -162.5
-offset_top = 48.0
-offset_right = 162.5
-offset_bottom = 115.0
-grow_horizontal = 2
-theme_override_font_sizes/font_size = 48
-text = "WAKEUPTCHA"
-
-[node name="Time" type="Label" parent="Container/Alarm"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -143.0
-offset_top = 125.0
-offset_right = 143.0
-offset_bottom = 224.0
-grow_horizontal = 2
-theme_override_font_sizes/font_size = 100
-text = "12:34:56"
-script = SubResource("GDScript_mbuur")

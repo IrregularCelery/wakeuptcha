@@ -14,14 +14,13 @@ func _ready() -> void:
 		"cache_enabled": true,
 		"max_cached_views": 5,
 		"animation_duration": 0.1,
-		"default_transition": "slide",
+		"default_transition": "zoom",
 	})
 	ViewManager.preload_views({
 		"home": "res://scenes/views/home.tscn",
 		"settings": "res://scenes/views/settings.tscn",
 	}, true)
 	ViewManager.set_default_view("home")
-
 
 
 func is_portrait() -> bool:
@@ -34,6 +33,7 @@ func is_portrait() -> bool:
 func update_layout() -> void:
 	if is_portrait():
 		# Portrait layout: Content takes full screen, ignoring margins
+
 		container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 		return
