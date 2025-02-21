@@ -1,4 +1,4 @@
-extends Node
+extends Control
 
 var views := {}
 var view_instances := {}
