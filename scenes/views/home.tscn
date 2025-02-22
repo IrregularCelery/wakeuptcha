@@ -7,7 +7,11 @@ script/source = "extends Control
 
 # Signals
 
-func _on_button_pressed() -> void:
+func _on_alarms_button_pressed() -> void:
+	ViewManager.switch_to_view(\"alarms\")
+
+
+func _on_settings_button_pressed() -> void:
 	ViewManager.switch_to_view(\"settings\")
 "
 
@@ -210,4 +214,5 @@ theme_override_font_sizes/font_size = 100
 text = "12:34:56"
 script = SubResource("GDScript_u1gyp")
 
-[connection signal="pressed" from="SettingsButton" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="AlarmsButton" to="." method="_on_alarms_button_pressed"]
+[connection signal="pressed" from="SettingsButton" to="." method="_on_settings_button_pressed"]

@@ -18,6 +18,7 @@ func _ready() -> void:
 	})
 	ViewManager.preload_views({
 		"home": "res://scenes/views/home.tscn",
+		"alarms": "res://scenes/views/alarms.tscn",
 		"settings": "res://scenes/views/settings.tscn",
 	}, true)
 	ViewManager.set_default_view("home")
