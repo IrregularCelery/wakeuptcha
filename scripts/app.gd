@@ -8,8 +8,8 @@ func _ready() -> void:
 
 	await get_tree().process_frame
 
-	get_node("/root/ViewManager").reparent(container)
-
+	ViewManager.reparent(container)
+	ViewManager.set_offsets_preset(PRESET_FULL_RECT)
 	ViewManager.configure({
 		"cache_enabled": true,
 		"max_cached_views": 5,
