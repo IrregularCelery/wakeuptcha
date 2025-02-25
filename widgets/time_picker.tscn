@@ -5,13 +5,21 @@
 [sub_resource type="GDScript" id="GDScript_yw0dk"]
 script/source = "extends Control
 
+enum Mode {
+	H24 = -1,
+	AM  =  0,
+	PM  =  1,
+}
+
 var hour: int = -1
 var minute: int = -1
+
+var mode := Mode.H24
 
 @onready var hour_wheel := $HourWheel
 @onready var minute_wheel := $MinuteWheel
 
-signal changed(hour: int, minute: int)
+signal changed(changed_hour: int, changed_minute: int)
 
 func _ready() -> void:
 	hour = hour_wheel.selected
@@ -23,12 +31,71 @@ func _ready() -> void:
 	changed.connect(_on_time_picker_changed)
 
 
-func set_time(new_hour: int, new_minute: int):
+func set_hour(new_hour:int):
 	hour_wheel.set_selected(new_hour)
-	minute_wheel.set_selected(new_minute)
-
 	hour = new_hour
+
+
+func set_minute(new_minute:int):
+	minute_wheel.set_selected(new_minute)
 	minute = new_minute
+
+
+func set_time(new_hour: int, new_minute: int):
+	set_hour(new_hour)
+	set_minute(new_minute)
+
+
+func set_mode(new_mode: Mode):
+	match new_mode:
+		Mode.H24:
+			_set_mode_h24()
+		Mode.AM:
+			_set_mode_am()
+		Mode.PM:
+			_set_mode_pm()
+
+
+func _set_mode_h24():
+	var old_mode := mode
+
+	mode = Mode.H24
+
+	hour_wheel.set_range(0, 23)
+
+	match old_mode:
+		Mode.AM:
+			set_hour(hour)
+		Mode.PM:
+			set_hour(hour + 12)
+		_: pass
+
+
+func _set_mode_am():
+	var old_mode := mode
+
+	mode = Mode.AM
+
+	hour_wheel.set_range(1, 12)
+
+	match old_mode:
+		Mode.H24:
+			set_hour(hour - 12 if hour > 12 else hour)
+		_: pass
+
+
+
+func _set_mode_pm():
+	var old_mode := mode
+
+	mode = Mode.PM
+
+	hour_wheel.set_range(1, 12)
+
+	match old_mode:
+		Mode.H24:
+			set_hour(hour - 12 if hour > 12 else hour)
+		_: pass
 
 # Signals
 
@@ -44,8 +111,15 @@ func _on_minute_change(selected: int):
 	changed.emit(hour, minute)
 
 
-func _on_time_picker_changed(hour: int, minute: int):
-	print(str(hour) + \":\" + str(minute))
+func _on_time_picker_changed(changed_hour: int, changed_minute: int):
+	print(str(changed_hour) + \":\" + str(changed_minute))
+
+
+func _on_test_mode_pressed() -> void:
+	if mode == Mode.AM:
+		set_mode(Mode.PM)
+	else:
+		set_mode(Mode.AM)
 "
 
 [node name="TimePicker" type="Control"]
@@ -83,3 +157,11 @@ grow_horizontal = 0
 grow_vertical = 2
 items_start = 0
 items_end = 59
+
+[node name="TestMode" type="Button" parent="."]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+text = "AM/PM"
+
+[connection signal="pressed" from="TestMode" to="." method="_on_test_mode_pressed"]

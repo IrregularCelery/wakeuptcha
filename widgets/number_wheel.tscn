@@ -10,7 +10,10 @@ var max_visible_items: int = 5
 var item_height: float = 0.0
 
 var items := []
+var index: int = 0
 var selected: int = 0
+
+var is_refreshing := false
 
 @export var items_start: int = 1
 @export var items_end: int = 100
@@ -27,6 +30,27 @@ func _ready() -> void:
 
 	item_height = _calc_items_height()
 
+	create_items()
+
+	size.y = item_height * max_visible_items
+
+
+func _process(delta: float) -> void:
+	if is_refreshing:
+		return
+
+	var current = roundi(scroll_vertical / item_height)
+
+	if index != current:
+		index = current
+		selected = index + items_start
+
+		changed.emit(selected)
+
+	_snap_to_nearest(delta)
+
+
+func create_items():
 	# We add half of the amount of `max_visible_items` as dummies so,
 	# the first and last items are centered when selected
 	var dummies: int = int((max_visible_items - 1) / 2.0) \\
@@ -46,26 +70,34 @@ func _ready() -> void:
 	for i in range(dummies):
 		_add_dummy_item().custom_minimum_size.y = item_height
 
-	size.y = item_height * max_visible_items
-
-
-func _process(delta: float) -> void:
-	var current = roundi(scroll_vertical / item_height)
-
-	if selected != current:
-		selected = current
-
-		changed.emit(selected)
-
-	_snap_to_nearest(delta)
-
 
 func set_selected(value: int):
 	selected = clamp(value, items_start, items_end)
-
-	var index := selected - items_start
+	index = selected - items_start
 
 	scroll_vertical = index * int(item_height)
+
+
+func set_range(start_value: int, end_value: int):
+	items_start = start_value
+	items_end = end_value
+
+	_refresh()
+
+
+func _refresh():
+	is_refreshing = true
+
+	items.clear()
+
+	for child in container.get_children():
+		child.queue_free()
+
+	create_items()
+
+	await get_tree().process_frame
+
+	is_refreshing = false
 
 
 func _calc_items_height() -> float:
@@ -93,30 +125,30 @@ func _add_dummy_item() -> Control:
 
 
 func _snap_to_nearest(delta: float):
-	var selected_item: Label = items[selected]
+	var selected_item: Label = items[index]
 	selected_item.add_theme_color_override(\"font_color\", Color.YELLOW)
 
-	# Reset the style of items before and after the selected item
+	# Reset the style of items before and after the index item
 	# TODO: Make better visuals!
-	if selected - 2 >= 0:
-		items[selected - 2].add_theme_color_override(
+	if index - 2 >= 0:
+		items[index - 2].add_theme_color_override(
 			\"font_color\", Color.GRAY
 		)
-	if selected - 1 >= 0:
-		items[selected - 1].add_theme_color_override(
+	if index - 1 >= 0:
+		items[index - 1].add_theme_color_override(
 			\"font_color\", Color.GRAY
 		)
-	if selected + 1 < items.size():
-		items[selected + 1].add_theme_color_override(
+	if index + 1 < items.size():
+		items[index + 1].add_theme_color_override(
 			\"font_color\", Color.GRAY
 		)
-	if selected + 2 < items.size():
-		items[selected + 2].add_theme_color_override(
+	if index + 2 < items.size():
+		items[index + 2].add_theme_color_override(
 			\"font_color\", Color.GRAY
 		)
 
 	scroll_vertical = lerp(scroll_vertical,
-		selected * int(item_height), delta * 10.0)
+		index * int(item_height), delta * 10.0)
 "
 
 [node name="NumberWheel" type="ScrollContainer"]
