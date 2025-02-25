@@ -1,122 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://bu76trp747cmi"]
+[gd_scene load_steps=2 format=3 uid="uid://bu76trp747cmi"]
 
-[sub_resource type="Theme" id="Theme_j5m2g"]
-Label/font_sizes/font_size = 48
-
-[sub_resource type="GDScript" id="GDScript_1s2f2"]
-script/source = "extends ScrollContainer
-
-var max_visible_items: int = 5
-var item_height: float = 0.0
-
-var items := []
-var selected: int = 0
-
-@export var items_start: int = 0
-@export var items_end: int = 23
-
-@onready var container: VBoxContainer = $Container
-
-signal changed(selected: int)
-
-func _ready() -> void:
-	assert(max_visible_items >= 3)
-
-	if max_visible_items % 2 == 0:
-		push_warning(\"It's recommended to choose an `Odd` number for symmetry!\")
-
-	item_height = _calc_items_height()
-
-	# We add half of the amount of `max_visible_items` as dummies so,
-	# the first and last items are centered
-	var dummies: int = int((max_visible_items - 1) / 2.0) \\
-		if max_visible_items % 2 == 1 else int(max_visible_items / 2.0)
-
-	for i in range(dummies):
-		_add_dummy_item().custom_minimum_size.y = item_height
-
-	for i in range(items_start, items_end + 1):
-		var item := Label.new()
-		item.text = str(i).pad_zeros(2)
-
-		items.push_back(item)
-
-		container.add_child(item)
-
-	for i in range(dummies):
-		_add_dummy_item().custom_minimum_size.y = item_height
-
-	size.y = item_height * max_visible_items
-
-
-func _process(delta: float) -> void:
-	var current = roundi(scroll_vertical / item_height)
-
-	if selected != current:
-		selected = current
-
-		changed.emit(selected)
-
-	_snap_to_nearest(delta)
-
-
-func set_selected(item: int):
-	selected = clamp(item, items_start, items_end)
-
-	var index := selected - items_start
-
-	scroll_vertical = index * int(item_height)
-
-
-func _calc_items_height() -> float:
-	var height: float
-
-	# We create a temp label and after getting its styles, we remove it
-	var temp_label := Label.new()
-	temp_label.text = \"0\"
-
-	container.add_child(temp_label)
-
-	height = temp_label.size.y
-
-	temp_label.queue_free()
-
-	return height
-
-
-func _add_dummy_item() -> Control:
-	var dummy := Control.new()
-
-	container.add_child(dummy)
-
-	return dummy
-
-
-func _snap_to_nearest(delta: float):
-	var selected_item: Label = items[selected]
-	selected_item.add_theme_color_override(\"font_color\", Color.YELLOW)
-
-	# Reset the style of items before and after the selected item
-	if selected - 2 >= 0:
-		items[selected - 2].add_theme_color_override(
-			\"font_color\", Color.GRAY
-		)
-	if selected - 1 >= 0:
-		items[selected - 1].add_theme_color_override(
-			\"font_color\", Color.GRAY
-		)
-	if selected + 1 < items.size():
-		items[selected + 1].add_theme_color_override(
-			\"font_color\", Color.GRAY
-		)
-	if selected + 2 < items.size():
-		items[selected + 2].add_theme_color_override(
-			\"font_color\", Color.GRAY
-		)
-
-	scroll_vertical = lerp(scroll_vertical,
-		selected * int(item_height), delta * 10.0)
-"
+[ext_resource type="PackedScene" uid="uid://7q5i2yd56lvi" path="res://widgets/number_wheel.tscn" id="1_kmodp"]
 
 [node name="TimePicker" type="Control"]
 layout_mode = 3
@@ -126,14 +10,29 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Hour" type="ScrollContainer" parent="."]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 49.72
-theme = SubResource("Theme_j5m2g")
-horizontal_scroll_mode = 0
-script = SubResource("GDScript_1s2f2")
+[node name="HourWheel" parent="." instance=ExtResource("1_kmodp")]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -24.86
+offset_bottom = 24.86
+grow_vertical = 2
+items_start = 0
+items_end = 23
 
-[node name="Container" type="VBoxContainer" parent="Hour"]
-layout_mode = 2
-theme_override_constants/separation = 0
+[node name="MinuteWheel" parent="." instance=ExtResource("1_kmodp")]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -40.0
+offset_top = -24.86
+offset_right = 0.0
+offset_bottom = 24.86
+grow_horizontal = 0
+grow_vertical = 2
+items_start = 0
+items_end = 59
