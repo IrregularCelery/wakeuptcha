@@ -60,8 +60,8 @@ func _process(delta: float) -> void:
 	_snap_to_nearest(delta)
 
 
-func set_selected(item: int):
-	selected = clamp(item, items_start, items_end)
+func set_selected(value: int):
+	selected = clamp(value, items_start, items_end)
 
 	var index := selected - items_start
 

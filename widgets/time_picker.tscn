@@ -1,6 +1,52 @@
-[gd_scene load_steps=2 format=3 uid="uid://bu76trp747cmi"]
+[gd_scene load_steps=3 format=3 uid="uid://bu76trp747cmi"]
 
 [ext_resource type="PackedScene" uid="uid://7q5i2yd56lvi" path="res://widgets/number_wheel.tscn" id="1_kmodp"]
+
+[sub_resource type="GDScript" id="GDScript_yw0dk"]
+script/source = "extends Control
+
+var hour: int = -1
+var minute: int = -1
+
+@onready var hour_wheel := $HourWheel
+@onready var minute_wheel := $MinuteWheel
+
+signal changed(hour: int, minute: int)
+
+func _ready() -> void:
+	hour = hour_wheel.selected
+	minute = minute_wheel.selected
+
+	hour_wheel.changed.connect(_on_hour_change)
+	minute_wheel.changed.connect(_on_minute_change)
+
+	changed.connect(_on_time_picker_changed)
+
+
+func set_time(new_hour: int, new_minute: int):
+	hour_wheel.set_selected(new_hour)
+	minute_wheel.set_selected(new_minute)
+
+	hour = new_hour
+	minute = new_minute
+
+# Signals
+
+func _on_hour_change(selected: int):
+	hour = selected
+
+	changed.emit(hour, minute)
+
+
+func _on_minute_change(selected: int):
+	minute = selected
+
+	changed.emit(hour, minute)
+
+
+func _on_time_picker_changed(hour: int, minute: int):
+	print(str(hour) + \":\" + str(minute))
+"
 
 [node name="TimePicker" type="Control"]
 layout_mode = 3
@@ -9,6 +55,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = SubResource("GDScript_yw0dk")
 
 [node name="HourWheel" parent="." instance=ExtResource("1_kmodp")]
 layout_mode = 1
