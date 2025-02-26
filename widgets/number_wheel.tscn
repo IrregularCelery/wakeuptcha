@@ -39,6 +39,7 @@ func _process(delta: float) -> void:
 	if is_refreshing:
 		return
 
+
 	var current = roundi(scroll_vertical / item_height)
 
 	if index != current:
@@ -47,7 +48,7 @@ func _process(delta: float) -> void:
 
 		changed.emit(selected)
 
-	_snap_to_nearest(delta)
+	_snap_to_nearest()
 
 
 func create_items():
@@ -124,7 +125,7 @@ func _add_dummy_item() -> Control:
 	return dummy
 
 
-func _snap_to_nearest(delta: float):
+func _snap_to_nearest():
 	var selected_item: Label = items[index]
 	selected_item.add_theme_color_override(\"font_color\", Color.YELLOW)
 
@@ -147,8 +148,11 @@ func _snap_to_nearest(delta: float):
 			\"font_color\", Color.GRAY
 		)
 
-	scroll_vertical = lerp(scroll_vertical,
-		index * int(item_height), delta * 10.0)
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_CUBIC)
+	tween.set_ease(Tween.EASE_OUT)
+
+	tween.tween_property(self, \"scroll_vertical\", index * int(item_height), 0.5)
 "
 
 [node name="NumberWheel" type="ScrollContainer"]
