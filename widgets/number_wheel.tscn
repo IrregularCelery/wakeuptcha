@@ -10,6 +10,7 @@ var max_visible_items: int = 5
 var item_height: float = 0.0
 
 var items := []
+var dummies := []
 var index: int = 0
 var selected: int = 0
 
@@ -28,14 +29,17 @@ func _ready() -> void:
 	if max_visible_items % 2 == 0:
 		push_warning(\"It's recommended to choose an `Odd` number for symmetry!\")
 
-	item_height = _calc_items_height()
+	_calc_item_height()
 
 	create_items()
 
 	size.y = item_height * max_visible_items
 
+	# We need to update the `item_height` if the window was resized
+	get_tree().root.size_changed.connect(_on_window_resize)
 
-func _process(delta: float) -> void:
+
+func _process(_delta: float) -> void:
 	if is_refreshing:
 		return
 
@@ -54,10 +58,10 @@ func _process(delta: float) -> void:
 func create_items():
 	# We add half of the amount of `max_visible_items` as dummies so,
 	# the first and last items are centered when selected
-	var dummies: int = int((max_visible_items - 1) / 2.0) \\
+	var new_dummies: int = int((max_visible_items - 1) / 2.0) \\
 		if max_visible_items % 2 == 1 else int(max_visible_items / 2.0)
 
-	for i in range(dummies):
+	for i in range(new_dummies):
 		_add_dummy_item().custom_minimum_size.y = item_height
 
 	for i in range(items_start, items_end + 1):
@@ -68,7 +72,7 @@ func create_items():
 
 		container.add_child(item)
 
-	for i in range(dummies):
+	for i in range(new_dummies):
 		_add_dummy_item().custom_minimum_size.y = item_height
 
 
@@ -101,58 +105,59 @@ func _refresh():
 	is_refreshing = false
 
 
-func _calc_items_height() -> float:
-	var height: float
-
+func _calc_item_height():
 	# We create a temp label and after getting its styles, we remove it
 	var temp_label := Label.new()
 	temp_label.text = \"0\"
 
 	container.add_child(temp_label)
 
-	height = temp_label.size.y
+	item_height = temp_label.size.y
 
 	temp_label.queue_free()
 
-	return height
+	if dummies.size() > 0:
+		for dummy: Control in dummies:
+			dummy.custom_minimum_size.y = item_height
 
 
 func _add_dummy_item() -> Control:
 	var dummy := Control.new()
+	dummies.push_back(dummy)
 
 	container.add_child(dummy)
+
 
 	return dummy
 
 
 func _snap_to_nearest():
-	var selected_item: Label = items[index]
-	selected_item.add_theme_color_override(\"font_color\", Color.YELLOW)
-
-	# Reset the style of items before and after the index item
-	# TODO: Make better visuals!
-	if index - 2 >= 0:
-		items[index - 2].add_theme_color_override(
-			\"font_color\", Color.GRAY
-		)
-	if index - 1 >= 0:
-		items[index - 1].add_theme_color_override(
-			\"font_color\", Color.GRAY
-		)
-	if index + 1 < items.size():
-		items[index + 1].add_theme_color_override(
-			\"font_color\", Color.GRAY
-		)
-	if index + 2 < items.size():
-		items[index + 2].add_theme_color_override(
-			\"font_color\", Color.GRAY
-		)
+	_update_items_style()
 
 	var tween = create_tween()
 	tween.set_trans(Tween.TRANS_CUBIC)
 	tween.set_ease(Tween.EASE_OUT)
 
 	tween.tween_property(self, \"scroll_vertical\", index * int(item_height), 0.5)
+
+
+# TODO: Make better visuals!
+func _update_items_style():
+	for i in items.size():
+		var item: Label = items[i]
+
+		if i == index:
+			item.add_theme_color_override(\"font_color\", Color.YELLOW)
+
+			continue
+
+		# Reset the style of other items that are not selected
+		item.add_theme_color_override(\"font_color\", Color.GRAY)
+
+# Signals
+
+func _on_window_resize() -> void:
+	_calc_item_height()
 "
 
 [node name="NumberWheel" type="ScrollContainer"]
