@@ -55,6 +55,8 @@ func _process(_delta: float) -> void:
 
 		changed.emit(selected)
 
+		_update_items_style()
+
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
@@ -143,17 +145,15 @@ func _calc_item_height():
 
 func _add_dummy_item() -> Control:
 	var dummy := Control.new()
+
 	dummies.push_back(dummy)
 
 	container.add_child(dummy)
-
 
 	return dummy
 
 
 func _snap_to_nearest():
-	_update_items_style()
-
 	tween = create_tween()
 	tween.set_trans(Tween.TRANS_CUBIC)
 	tween.set_ease(Tween.EASE_OUT)
