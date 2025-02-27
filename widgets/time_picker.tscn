@@ -159,9 +159,15 @@ items_start = 0
 items_end = 59
 
 [node name="TestMode" type="Button" parent="."]
-layout_mode = 0
-offset_right = 8.0
-offset_bottom = 8.0
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -32.5
+offset_top = -150.0
+offset_right = 32.5
+offset_bottom = -119.0
+grow_horizontal = 2
 text = "AM/PM"
 
 [connection signal="pressed" from="TestMode" to="." method="_on_test_mode_pressed"]
