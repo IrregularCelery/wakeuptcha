@@ -64,8 +64,7 @@ func _gui_input(event: InputEvent) -> void:
 			if event.pressed:
 				is_dragging = true
 
-				if tween.is_running():
-					tween.kill()
+				_stop_snapping()
 			else:
 				is_dragging = false
 
@@ -160,6 +159,10 @@ func _snap_to_nearest():
 
 	tween.tween_property(self, \"scroll_vertical\", index * int(item_height), 0.4)
 
+
+func _stop_snapping():
+	if tween.is_running():
+		tween.kill()
 
 # TODO: Make better visuals!
 func _update_items_style():
