@@ -15,6 +15,9 @@ var index: int = 0
 var selected: int = 0
 
 var is_refreshing := false
+var is_dragging := false
+
+var tween: Tween
 
 @export var items_start: int = 1
 @export var items_end: int = 100
@@ -30,10 +33,11 @@ func _ready() -> void:
 		push_warning(\"It's recommended to choose an `Odd` number for symmetry!\")
 
 	_calc_item_height()
-
-	create_items()
+	_create_items()
 
 	size.y = item_height * max_visible_items
+
+	_snap_to_nearest()
 
 	# We need to update the `item_height` if the window was resized
 	get_tree().root.size_changed.connect(_on_window_resize)
@@ -43,7 +47,6 @@ func _process(_delta: float) -> void:
 	if is_refreshing:
 		return
 
-
 	var current = roundi(scroll_vertical / item_height)
 
 	if index != current:
@@ -52,10 +55,41 @@ func _process(_delta: float) -> void:
 
 		changed.emit(selected)
 
+
+func _gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				is_dragging = true
+
+				if tween.is_running():
+					tween.kill()
+			else:
+				is_dragging = false
+
+				_snap_to_nearest()
+
+	elif event is InputEventMouseMotion and is_dragging:
+		scroll_vertical -= event.relative.y
+
+
+func set_selected(value: int):
+	selected = clamp(value, items_start, items_end)
+	index = selected - items_start
+
+	scroll_vertical = index * int(item_height)
+
 	_snap_to_nearest()
 
 
-func create_items():
+func set_range(start_value: int, end_value: int):
+	items_start = start_value
+	items_end = end_value
+
+	_refresh()
+
+
+func _create_items():
 	# We add half of the amount of `max_visible_items` as dummies so,
 	# the first and last items are centered when selected
 	var new_dummies: int = int((max_visible_items - 1) / 2.0) \\
@@ -76,20 +110,6 @@ func create_items():
 		_add_dummy_item().custom_minimum_size.y = item_height
 
 
-func set_selected(value: int):
-	selected = clamp(value, items_start, items_end)
-	index = selected - items_start
-
-	scroll_vertical = index * int(item_height)
-
-
-func set_range(start_value: int, end_value: int):
-	items_start = start_value
-	items_end = end_value
-
-	_refresh()
-
-
 func _refresh():
 	is_refreshing = true
 
@@ -98,7 +118,7 @@ func _refresh():
 	for child in container.get_children():
 		child.queue_free()
 
-	create_items()
+	_create_items()
 
 	await get_tree().process_frame
 
@@ -134,11 +154,11 @@ func _add_dummy_item() -> Control:
 func _snap_to_nearest():
 	_update_items_style()
 
-	var tween = create_tween()
+	tween = create_tween()
 	tween.set_trans(Tween.TRANS_CUBIC)
 	tween.set_ease(Tween.EASE_OUT)
 
-	tween.tween_property(self, \"scroll_vertical\", index * int(item_height), 0.5)
+	tween.tween_property(self, \"scroll_vertical\", index * int(item_height), 0.4)
 
 
 # TODO: Make better visuals!
@@ -163,8 +183,10 @@ func _on_window_resize() -> void:
 [node name="NumberWheel" type="ScrollContainer"]
 offset_right = 40.0
 offset_bottom = 49.72
+mouse_default_cursor_shape = 9
 theme = SubResource("Theme_j5m2g")
 horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
 script = SubResource("GDScript_1s2f2")
 
 [node name="Container" type="VBoxContainer" parent="."]
