@@ -82,8 +82,6 @@ func set_selected(value: int):
 	selected = clamp(value, items_start, items_end)
 	index = selected - items_start
 
-	scroll_vertical = index * int(item_height)
-
 	_snap_to_nearest()
 
 
