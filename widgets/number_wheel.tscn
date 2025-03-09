@@ -86,6 +86,9 @@ func set_selected(value: int):
 
 
 func set_range(start_value: int, end_value: int):
+	if items_start == start_value and items_end == end_value:
+		return
+
 	items_start = start_value
 	items_end = end_value
 
@@ -165,6 +168,7 @@ func _snap_to_nearest():
 func _stop_snapping():
 	if tween.is_running():
 		tween.kill()
+
 
 # TODO: Make better visuals!
 func _update_items_style():

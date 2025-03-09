@@ -11,19 +11,18 @@ enum Mode {
 	PM  =  1,
 }
 
-var hour: int = -1
-var minute: int = -1
-
-var mode := Mode.H24
+var _hour: int = -1
+var _minute: int = -1
+var _mode := Mode.H24
 
 @onready var hour_wheel := $HourWheel
 @onready var minute_wheel := $MinuteWheel
 
-signal changed(changed_hour: int, changed_minute: int)
+signal changed(hour: int, minute: int, mode: Mode)
 
 func _ready() -> void:
-	hour = hour_wheel.selected
-	minute = minute_wheel.selected
+	_hour = hour_wheel.selected
+	_minute = minute_wheel.selected
 
 	hour_wheel.changed.connect(_on_hour_change)
 	minute_wheel.changed.connect(_on_minute_change)
@@ -33,12 +32,12 @@ func _ready() -> void:
 
 func set_hour(new_hour:int):
 	hour_wheel.set_selected(new_hour)
-	hour = new_hour
+	_hour = new_hour
 
 
 func set_minute(new_minute:int):
 	minute_wheel.set_selected(new_minute)
-	minute = new_minute
+	_minute = new_minute
 
 
 func set_time(new_hour: int, new_minute: int):
@@ -55,68 +54,81 @@ func set_mode(new_mode: Mode):
 		Mode.PM:
 			_set_mode_pm()
 
+	changed.emit(_hour, _minute, _mode)
+
+
 
 func _set_mode_h24():
-	var old_mode := mode
+	var old_mode := _mode
 
-	mode = Mode.H24
+	_mode = Mode.H24
 
 	hour_wheel.set_range(0, 23)
 
 	match old_mode:
 		Mode.AM:
-			set_hour(hour)
+			set_hour(_hour)
 		Mode.PM:
-			set_hour(hour + 12)
+			set_hour(_hour + 12)
 		_: pass
 
 
 func _set_mode_am():
-	var old_mode := mode
+	var old_mode := _mode
 
-	mode = Mode.AM
+	_mode = Mode.AM
 
 	hour_wheel.set_range(1, 12)
 
 	match old_mode:
 		Mode.H24:
-			set_hour(hour - 12 if hour > 12 else hour)
+			set_hour(_hour - 12 if _hour > 12 else _hour)
 		_: pass
 
 
 
 func _set_mode_pm():
-	var old_mode := mode
+	var old_mode := _mode
 
-	mode = Mode.PM
+	_mode = Mode.PM
 
 	hour_wheel.set_range(1, 12)
 
 	match old_mode:
 		Mode.H24:
-			set_hour(hour - 12 if hour > 12 else hour)
+			set_hour(_hour - 12 if _hour > 12 else _hour)
 		_: pass
 
 # Signals
 
 func _on_hour_change(selected: int):
-	hour = selected
+	_hour = selected
 
-	changed.emit(hour, minute)
+	changed.emit(_hour, _minute, _mode)
 
 
 func _on_minute_change(selected: int):
-	minute = selected
+	_minute = selected
 
-	changed.emit(hour, minute)
+	changed.emit(_hour, _minute, _mode)
 
 
-func _on_time_picker_changed(changed_hour: int, changed_minute: int):
-	print(str(changed_hour) + \":\" + str(changed_minute))
+func _on_time_picker_changed(hour: int, minute: int, mode: Mode):
+	var mode_str := \"\"
+
+	match mode:
+		Mode.AM:
+			mode_str = \" AM\"
+		Mode.PM:
+			mode_str = \" PM\"
+		_:
+			pass
+
+	print(str(hour) + \":\" + str(minute) + mode_str)
 
 
 func _on_test_mode_pressed() -> void:
-	if mode == Mode.AM:
+	if _mode == Mode.AM:
 		set_mode(Mode.PM)
 	else:
 		set_mode(Mode.AM)
